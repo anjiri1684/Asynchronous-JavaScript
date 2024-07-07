@@ -118,14 +118,14 @@
 // );
 // console.log(request);
 
-// const getJSON = async function (url, errorMsg = 'Somthing went wrong') {
-//   const response = await fetch(url);
-//   console.log(response);
-//   if (!response.ok) {
-//     throw new Error(`${errorMsg} ${response.status}`);
-//   }
-//   return await response.json();
-// };
+const getJSON = async function (url, errorMsg = 'Somthing went wrong') {
+  const response = await fetch(url);
+  console.log(response);
+  if (!response.ok) {
+    throw new Error(`${errorMsg} ${response.status}`);
+  }
+  return await response.json();
+};
 
 // const getCountryData = function (country) {
 //   // Fetch country 1
@@ -189,19 +189,142 @@
 //   console.log(res);
 // });
 
-const lotteryPromise = new Promise(function (resolve, reject) {
-  console.log('Lotter draw is happening🔮');
-  setTimeout(function () {
-    if (Math.random() >= 0.5) {
-      resolve('You win💰');
-    } else {
-      reject(new Error('You lost your money 😢'));
-    }
-  }, 2000);
-});
+// const lotteryPromise = new Promise(function (resolve, reject) {
+//   console.log('Lotter draw is happening🔮');
+//   setTimeout(function () {
+//     if (Math.random() >= 0.5) {
+//       resolve('You win💰');
+//     } else {
+//       reject(new Error('You lost your money 😢'));
+//     }
+//   }, 2000);
+// });
 
-lotteryPromise
-  .then(res => {
-    console.log(res);
-  })
+// lotteryPromise
+//   .then(res => {
+//     console.log(res);
+//   })
+//   .catch(err => console.error(err));
+
+// //promisifying setimeout
+// const wait = function (seconds) {
+//   return new Promise(function (resolve) {
+//     setTimeout(resolve, seconds * 1000);
+//   });
+// };
+
+// wait(2)
+//   .then(() => {
+//     console.log(`I waited for 2 sec`);
+//     return wait(1);
+//   })
+//   .then(() => {
+//     console.log(`I waited for 1 sec`);
+//   });
+
+// navigator.geolocation.getCurrentPosition(function (position) {
+//   console.log(position);
+//   error => console.log(error);
+// });
+
+// const imgContainer = document.querySelector('.images');
+
+// const createImage = function (imgPath) {
+//   return new Promise(function (resolve, reject) {
+//     const img = document.createElement('img');
+//     img.src = imgPath;
+
+//     img.addEventListener('load', function () {
+//       img.append(img);
+//       resolve(img);
+//     });
+//     img.addEventListener('error', function () {
+//       reject(new Error('Image not found'));
+//     });
+//   });
+// };
+
+// createImage('./img/img-1.jpg')
+//   .then(img => {
+//     console.log('Image 1 loaded');
+//   })
+//   .catch(err => console.error(err));
+
+// const whereAmI = async function (country) {
+//   const res = await fetch(
+//     `https://countries-api-836d.onrender.com/countries/name/${country}`
+//   );
+//   const data = await res.json();
+//   console.log(data[0]);
+// };
+
+// whereAmI('Kenya');
+// console.log('First');
+
+// const get3Countries = async function (c1, c2, c3) {
+//   try {
+//     const [data1] = await getJSON(
+//       `https://countries-api-836d.onrender.com/countries/name/${c1}`
+//      );
+// const [data2] = await getJSON(
+//   `https://countries-api-836d.onrender.com/countries/name/${c2}`
+// );
+// const [data3] = await getJSON(
+//   `https://countries-api-836d.onrender.com/countries/name/${c3}`
+// );
+
+//     const data = await Promise.all(
+//       getJSON(`https://countries-api-836d.onrender.com/countries/name/${c1}`),
+//       getJSON(`https://countries-api-836d.onrender.com/countries/name/${c2}`),
+//       getJSON(`https://countries-api-836d.onrender.com/countries/name/${c3}`)
+//     );
+
+//     console.log(data.map(d => d[0].capital));
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
+
+// get3Countries('kenya', 'tanzania', 'uganda');
+
+(async function () {
+  const res = await Promise.race([
+    getJSON(`https://countries-api-836d.onrender.com/countries/name/kenya`),
+    getJSON(`https://countries-api-836d.onrender.com/countries/name/somalia`),
+    getJSON(`https://countries-api-836d.onrender.com/countries/name/tanzania`),
+  ]);
+  console.log(res[0]);
+})();
+
+const timeout = function (sec) {
+  return new Promise(function (_, reject) {
+    setTimeout(function () {
+      reject(new Error('Request took too long'));
+    }, sec * 1000);
+  });
+};
+
+Promise.race([
+  getJSON(`https://countries-api-836d.onrender.com/countries/name/tanzania`),
+  timeout(10),
+])
+  .then(res => console.log(res[0]))
+  .catch(err => console.error(err));
+
+// promise .allsettled
+Promise.allSettled([
+  Promise.resolve('Success'),
+  Promise.reject('Error'),
+  Promise.resolve('Another Success'),
+])
+  .then(res => console.log(res[0]))
+  .catch(err => console.error(err));
+
+//promise .any[es2021]
+Promise.any([
+  Promise.resolve('Success'),
+  Promise.reject('Error'),
+  Promise.resolve('Another Success'),
+])
+  .then(res => console.log(res[0]))
   .catch(err => console.error(err));
